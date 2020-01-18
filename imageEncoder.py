@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 # Settings ----------------
 
 # length in secs
-audio_len = 5
+audio_len = 20
 # how many pixels are in a beat
 pixel_res = 8
 
@@ -15,13 +15,14 @@ pixel_res = 8
 # Settings ----------------
 
 
-midi_data = pretty_midi.PrettyMIDI('midi_downloads/africa.mid')
+midi_data = pretty_midi.PrettyMIDI('midi_downloads/bachStuff.mid')
+
+resolution = midi_data.resolution # how many ticks in a beat
+tick_duration = midi_data._tick_scales[0][1] # Get tick duration from the first tempo signature - we assume the tempo to be uniform
+audio_res = resolution / pixel_res * tick_duration # how long in seconds does a pixel lasts
 num_inst = len(midi_data.instruments)
 
 def discretize(input_time):
-    resoltuion = midi_data.resoltuion # how many ticks in a beat
-    tick_duration = midi_data._tick_scales[0][1] # Get tick duration from the first tempo signature - we assume the tempo to be uniform
-    audio_res = resolution / pixel_res * tick_duration # how long in seconds does a pixel lasts
 
     print("Resolution: " + str(resolution) + "; tick_duration: " + str(tick_duration) + "; audio_res: " + str(audio_res) )
 
@@ -43,7 +44,7 @@ def discretize(input_time):
 
 print(discretize(1.75))
 
-img = Image.new('RGB', (audio_len*audio_res, 25), 'black')
+img = Image.new('RGB', (math.ceil(audio_len / audio_res), num_inst), 'black')
 idraw = ImageDraw.Draw(img)
 
 for inst_index in range (0, num_inst):
@@ -59,6 +60,6 @@ for inst_index in range (0, num_inst):
         else:
             break
 
-img.save('midi_image.png')
+img.save('images/test.png')
 
 # print(midi_data.instruments[0].notes)
